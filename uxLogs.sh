@@ -1,6 +1,6 @@
 #!/bin/sh
 # Run with '--help' for usage information.
-# Updated 2023-05-24
+# Updated 2023-07-03
 # See https://github.com/greenseeker/uxlogs for latest version
 
 # Make sure uxLogs.sh was run as root.
@@ -131,7 +131,7 @@ case ${flavor} in
   fi
 
   printf "\n%s\n" "Collecting installed package list ... " | tee -a "${scriptLog}"
-  if [ -f /usr/bin/rpm ] || [ - /usr/bin/dnf ]; then
+  if [ -f /usr/bin/rpm ] || [ -f /usr/bin/dnf ]; then
     rpm -qa | sort >> "${tmpDir}/cvcollect/installed_rpm_packages.txt" && printf "%s\n" "rpm packages collected" | tee -a "${scriptLog}"
   elif [ -f /usr/bin/dpkg ]; then
     dpkg -l >> "${tmpDir}/cvcollect/installed_deb_packages.txt" && printf "%s\n" "deb packages collected" | tee -a "${scriptLog}"
@@ -156,7 +156,7 @@ case ${flavor} in
   printf "%s\n\n\n%s" "$(df -k)" "$(mount)" >> "${tmpDir}/cvcollect/disks.txt" && printf "... %s\n" "Diskspace and mount info collected" | tee -a "${scriptLog}"
   [ -f /usr/sbin/ipfstat ]          && ipfstat -io >> "${tmpDir}/cvcollect/firewall.txt" 2>&1 && printf "... %s\n" "Firewall rules collected" | tee -a "${scriptLog}"
   [ -f /usr/sbin/ifconfig ]         && ifconfig -a >> "${tmpDir}/cvcollect/network.txt" && printf "... %s\n" "Interface list collected" | tee -a "${scriptLog}" 
-  [ -f /usr/bin/prctl]              && prctl -i project user.root simpana 2>&1 >> "${tmpDir}/cvcollect/kernel_parameters.txt" && printf "... %s\n" "Kernel parameters collected"
+  [ -f /usr/bin/prctl ]             && prctl -i project user.root simpana >> "${tmpDir}/cvcollect/kernel_parameters.txt" 2>&1 && printf "... %s\n" "Kernel parameters collected"
   ;;
  Darwin) 
   printf "%s\n" "macOS detected" | tee -a "${scriptLog}"
@@ -332,14 +332,14 @@ fi
 # Capture per-instance info.
 instList=$(ls -1d /etc/CommVaultRegistry/Galaxy/Instance*)
 for cvinst in ${instList}; do
- base=$(awk '/dHOME /{ print $2 }' ${cvinst}/Base/.properties)
- logs=$(awk '/dEVLOGDIR /{ print $2 }' ${cvinst}/EventManager/.properties)
- jobR=$(awk '/dJOBRESULTSDIR /{ print $2 }' ${cvinst}/Machines/*/.properties)
- csName=$(awk '/sCSHOSTNAME /{ print $2 }' ${cvinst}/CommServe/.properties)
- scaleoutPlatform=$(awk '/sScaleoutPlatformType /{ print $2 }' ${cvinst}/MediaAgent/.properties)
- isCS=$(awk '/dHOME /{ print $2 }' ${cvinst}/CommServe/.properties)
- drPath=$(awk '/sCSDRPATH /{ print $2 }' ${cvinst}/CommServe/.properties)
- tomcatPath=$(awk '/sZTOMCATHOME/ { print $2 }' ${cvinst}/WebConsole/.properties)
+ base=$(awk '/dHOME /{ print $2 }' "${cvinst}"/Base/.properties)
+ logs=$(awk '/dEVLOGDIR /{ print $2 }' "${cvinst}"/EventManager/.properties)
+ jobR=$(awk '/dJOBRESULTSDIR /{ print $2 }' "${cvinst}"/Machines/*/.properties)
+ csName=$(awk '/sCSHOSTNAME /{ print $2 }' "${cvinst}"/CommServe/.properties)
+ scaleoutPlatform=$(awk '/sScaleoutPlatformType /{ print $2 }' "${cvinst}"/MediaAgent/.properties)
+ isCS=$(awk '/dHOME /{ print $2 }' "${cvinst}"/CommServe/.properties)
+ drPath=$(awk '/sCSDRPATH /{ print $2 }' "${cvinst}"/CommServe/.properties)
+ tomcatPath=$(awk '/sZTOMCATHOME/ { print $2 }' "${cvinst}"/WebConsole/.properties)
 
  
  printf "%s\n" "=== ${cvinst} ===" >> "${infoFile}"
@@ -360,9 +360,9 @@ for cvinst in ${instList}; do
 # Capture job-specific information.
  if [ -n "${JID}" ]; then
   for temp in ${jobR}; do
-   if [ -d "${jobR}/CV_JobResults/2/0/${JID}" ]; then
+   if [ -d "${temp}/CV_JobResults/2/0/${JID}" ]; then
     printf "%s\n" "Collecting jobResults ..." | tee -a "${scriptLog}"
-    tar -rhf "${tarball}" ${jobR}/CV_JobResults/2/0/${JID} >> "${scriptLog}" 2>&1 || printf "    --- %s\n" "Failed to tar ${jobR}/CV_JobResults/2/0/${JID} -- continuing ..."
+    tar -rhf "${tarball}" ${temp}/CV_JobResults/2/0/${JID} >> "${scriptLog}" 2>&1 || printf "    --- %s\n" "Failed to tar ${temp}/CV_JobResults/2/0/${JID} -- continuing ..."
    fi
   done
  fi
