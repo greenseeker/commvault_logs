@@ -13,6 +13,13 @@ You can see all  options with `--help`.
 The script will prompt you for where to create the bundle; defaults to /tmp.
 
 ## History
+### 2023-10-25 Changes
+#### Hyperscale Detection
+Fixed an issue where an error would be reported if the system is not a MediaAgent.
+
+#### General
+Switched to 4-space indentation.
+
 ### 2023-07-03 Changes
 #### Job Results
 Fixed an issue with collecting Job Results on multi-instance installs.
