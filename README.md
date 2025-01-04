@@ -45,7 +45,7 @@ Now captures Commvault's Tomcat server.xml file, if present.
 Capture mssql.conf and /var/opt/mssql/log if `--mssql` is passed or if this is a Linux CS.
 
 #### Linux Commserve
-Capture the latest CSDR if `--csdr`  is passed. This does not confrim that backup is complete or valid.
+Capture the latest CSDR if `--csdr`  is passed. This does not confirm that backup is complete or valid.
 
 ### 2022-06-03 Changes
 #### General
